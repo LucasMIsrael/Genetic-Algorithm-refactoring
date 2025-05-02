@@ -1,0 +1,5 @@
+Numero de Itens;Valor Total;Peso Total;Tempo de Execucao (segundos);Numero de Geracoes
+5;35;10;0.066;100
+10;75;28;0.094;100
+1000;5832;2686;5.461;100
+10000;53851;27373;40.504;100
