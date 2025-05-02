@@ -113,8 +113,6 @@ knapsack_ga/
 ├── utils.py                     # Utilitários para geração de dados e tempo
 ├── resultados/
 │   └── resultados.xsls          # Resultados organizados dos testes
-├── docs/
-│   └── README.md (este arquivo)
 ```
 
 ---
