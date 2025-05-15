@@ -3,90 +3,81 @@ from openpyxl.styles import Font, Alignment, Border, Side
 from utils import gerar_instancia
 from genetic_algorithm import algoritmo_genetico
 import time
+import statistics
 
-def testar_algoritmo_genetico(tamanhos, num_geracoes=100):
+def testar_algoritmo_genetico(tamanhos, num_geracoes=100, num_execucoes=10):
     resultados = []
+
     for tam in tamanhos:
-        pesos, valores, capacidade = gerar_instancia(tam)
-        inicio = time.time()
-        resultado = algoritmo_genetico(pesos, valores, capacidade, tam_pop=50, num_geracoes=num_geracoes)
-        fim = time.time()
-        
-        # Organizando os dados
-        resultado["num_itens"] = tam
-        resultado["valor_total"] = resultado["valor_total"]
-        resultado["peso_total"] = resultado["peso_total"]
-        resultado["tempo_execucao_seg"] = round(fim - inicio, 3)
-        resultado["geracoes"] = num_geracoes  # Pode ser alterado conforme a variável num_geracoes
-        
-        # Adiciona o resultado à lista
-        resultados.append(resultado)
+        valores_totais = []
+        pesos_totais = []
+        tempos = []
+
+        for _ in range(num_execucoes):
+            pesos, valores, capacidade = gerar_instancia(tam)
+            inicio = time.time()
+            resultado = algoritmo_genetico(pesos, valores, capacidade, tam_pop=50, num_geracoes=num_geracoes)
+            fim = time.time()
+
+            valores_totais.append(resultado["valor_total"])
+            pesos_totais.append(resultado["peso_total"])
+            tempos.append(round(fim - inicio, 4))
+
+        resultados.append({
+            "num_itens": tam,
+            "media_valor": round(statistics.mean(valores_totais), 2),
+            "desvio_valor": round(statistics.stdev(valores_totais), 2) if len(valores_totais) > 1 else 0,
+            "melhor_valor": max(valores_totais),
+            "pior_valor": min(valores_totais),
+            "media_peso": round(statistics.mean(pesos_totais), 2),
+            "media_tempo": round(statistics.mean(tempos), 4),
+            "geracoes": num_geracoes,
+            "execucoes": num_execucoes
+        })
     return resultados
 
 def salvar_resultados_excel(resultados, filename="results/benchmarks.xlsx"):
-    """
-    Salva os resultados em um arquivo Excel com melhor formatação visual.
-    """
-    # Criando um novo workbook e uma planilha
     wb = openpyxl.Workbook()
     sheet = wb.active
     sheet.title = "Resultados"
 
-    # Definindo os títulos das colunas
     fieldnames = [
-        "Número de Itens", "Valor Total", "Peso Total", "Tempo de Execução (segundos)", "Número de Gerações"
+        "Número de Itens", "Média Valor", "Desvio Valor", "Melhor Valor", "Pior Valor",
+        "Média Peso", "Tempo Médio (s)", "Gerações", "Execuções"
     ]
 
-    # Adicionando os títulos das colunas na primeira linha
     for col_num, header in enumerate(fieldnames, 1):
         cell = sheet.cell(row=1, column=col_num)
         cell.value = header
-        # Aplicando formatação (negrito, centralizado)
         cell.font = Font(bold=True)
         cell.alignment = Alignment(horizontal='center', vertical='center')
 
-    # Adicionando os dados na planilha
-    for row_num, resultado in enumerate(resultados, 2):
-        sheet.cell(row=row_num, column=1, value=resultado["num_itens"])
-        sheet.cell(row=row_num, column=2, value=resultado["valor_total"])
-        sheet.cell(row=row_num, column=3, value=resultado["peso_total"])
-        sheet.cell(row=row_num, column=4, value=resultado["tempo_execucao_seg"])
-        sheet.cell(row=row_num, column=5, value=resultado["geracoes"])
+    for row_num, r in enumerate(resultados, 2):
+        valores = [
+            r["num_itens"], r["media_valor"], r["desvio_valor"],
+            r["melhor_valor"], r["pior_valor"], r["media_peso"],
+            r["media_tempo"], r["geracoes"], r["execucoes"]
+        ]
+        for col_num, val in enumerate(valores, 1):
+            sheet.cell(row=row_num, column=col_num, value=val)
 
-    # Ajustar a largura das colunas
     for col_num in range(1, len(fieldnames) + 1):
-        max_length = 0
-        column = openpyxl.utils.get_column_letter(col_num)
-        for row in sheet.iter_rows(min_col=col_num, max_col=col_num):
-            for cell in row:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(cell.value)
-                except:
-                    pass
-        adjusted_width = (max_length + 2)
-        sheet.column_dimensions[column].width = adjusted_width
+        col_letter = openpyxl.utils.get_column_letter(col_num)
+        sheet.column_dimensions[col_letter].width = 20
 
-    # Adicionando bordas nas células
     border = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
     )
-
     for row in sheet.iter_rows(min_row=1, max_row=len(resultados) + 1, min_col=1, max_col=len(fieldnames)):
         for cell in row:
             cell.border = border
 
-    # Salvando o arquivo Excel
     wb.save(filename)
 
 if __name__ == "__main__":
     tamanhos_teste = [5, 10, 1000, 10000]
-    resultados = testar_algoritmo_genetico(tamanhos_teste)
+    resultados = testar_algoritmo_genetico(tamanhos_teste, num_geracoes=100, num_execucoes=10)
     for r in resultados:
         print(r)
-    
-    # Salvar os resultados em Excel
     salvar_resultados_excel(resultados)
