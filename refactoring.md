@@ -1,6 +1,9 @@
 # Refatoração - Algoritmo Genético para o Problema da Mochila
 
 ### Autores: Lucas Mendes Israel, Gustavo Henrique Costa
+</br>
+
+**Apresentação em Slides**: [Refatoração-problemaDaMochila.pdf](https://github.com/user-attachments/files/20433039/Refatoracao-problemaDaMochila.pdf)
 
 Este documento descreve as mudanças realizadas no código original do algoritmo genético para o problema da mochila binária, explicando a motivação da refatoração e os testes automatizados criados para validar seu funcionamento.
 
