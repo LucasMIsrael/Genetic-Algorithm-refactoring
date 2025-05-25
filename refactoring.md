@@ -1,8 +1,8 @@
 # Refatoração e Validação - Algoritmo Genético para o Problema da Mochila
+### Feito por: Lucas Mendes Israel, Gustavo Henrique Costa
 
 Este documento descreve as mudanças realizadas no código original do algoritmo genético para o problema da mochila binária, explicando a motivação da refatoração e os testes automatizados criados para validar seu funcionamento.
 
----
 
 ## Refatorações Realizadas
 
@@ -119,7 +119,7 @@ Os testes foram escritos utilizando a biblioteca `pytest` para garantir a robust
 - Como a modularização facilita a leitura, a manutenção e a extensão futura do código.
 - A refatoração, mesmo simples, pode trazer ganhos significativos na confiabilidade e na escalabilidade de um projeto.
 
----
+
 
 ## Considerações Finais
 
